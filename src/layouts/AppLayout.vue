@@ -37,11 +37,9 @@ import RightSidebar from '@/layouts/RightSidebar.vue'
                         deadlines, and 1 event today.
                     </div>
                     <div class="mt-4 flex space-x-2">
-                        <a
-                            href="profile.html"
-                            class="flex-1 bg-indigo-600 text-white text-sm text-center py-1 rounded-md hover:bg-indigo-700"
-                            >View Profile</a
-                        >
+                        <router-link to="/profile"
+                    class="flex-1 bg-indigo-600 text-white text-sm text-center py-1 rounded-md hover:bg-indigo-700"
+                    >View Profile</router-link>
                         <a
                             href="#settings"
                             class="flex-1 bg-gray-200 text-gray-700 text-sm text-center py-1 rounded-md hover:bg-gray-300"
