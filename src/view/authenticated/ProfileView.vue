@@ -53,7 +53,7 @@ const profileBtn = document.getElementById('profile-button');
             teaching coding to younger students.
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
-            <div>
+            <div> 
               <span class="font-medium">Major:</span> Computer Science
             </div>
             <div>
