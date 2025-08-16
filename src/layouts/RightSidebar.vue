@@ -19,10 +19,9 @@
                 1 event today.
             </div>
             <div class="mt-4 flex space-x-2">
-                <a
-                    href="profile.html"
+                <router-link to="ProfileView.vue"
                     class="flex-1 bg-indigo-600 text-white text-sm text-center py-1 rounded-md hover:bg-indigo-700"
-                    >View Profile</a
+                    >View Profile</router-link
                 >
                 <a
                     href="#settings"
