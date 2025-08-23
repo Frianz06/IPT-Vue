@@ -1,21 +1,45 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { auth } from '@/config/firebaseConfig.js'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 
 const router = useRouter()
+
 const email = ref('')
 const password = ref('')
 const rememberMe = ref(false)
 
-const handleSubmit = () => {
-    // Handle form submission logic here
-    console.log('Email:', email.value)
-    console.log('Password:', password.value)
-    console.log('Remember Me:', rememberMe.value)
+// Login handler with Firebase
+const handleSubmit = async () => {
+    try {
+        const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email.value,
+            password.value
+        )
 
-    router.push('/feed')
+        console.log('User logged in:', userCredential)
+
+        // (Optional) use rememberMe here later for persistence
+
+        // Redirect to /feed after successful login
+        router.push('/feed')
+    } catch (err) {
+        console.error('Login error:', err)
+
+        const friendlyMessages = {
+            'auth/user-not-found': 'No account found for that email.',
+            'auth/wrong-password': 'Incorrect password. Please try again.',
+            'auth/invalid-email': 'Invalid email format.',
+            'auth/invalid-credential': 'Invalid Credentials.',
+        }
+
+        toast.error(friendlyMessages[err.code] || 'Something went wrong, please try again.')
+    }
 }
 </script>
+
 <template>
     <div
         class="bg-gray-100 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8"
@@ -25,16 +49,15 @@ const handleSubmit = () => {
                 <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
                     Sign in to your account
                 </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-                Or
-                <router-link 
-                to="/register" 
-                class="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                create a new account
-                </router-link>
-        </p>
-
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Or
+                    <router-link
+                        to="/register"
+                        class="font-medium text-indigo-600 hover:text-indigo-500"
+                    >
+                        create a new account
+                    </router-link>
+                </p>
             </div>
             <form class="mt-8 space-y-6" action="#" method="POST">
                 <input type="hidden" name="remember" value="true" />

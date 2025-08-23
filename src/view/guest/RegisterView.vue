@@ -2,29 +2,61 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+// ✅ Import firebase auth + firestore
+import { auth, db } from '@/config/firebaseConfig'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
+
 const router = useRouter()
+
 const fullName = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const terms = ref(false)
+const isSubmitting = ref(false)
 
-const handleRegister = () => {
+const handleRegister = async () => {
   if (!terms.value) {
-    alert('You must agree to the terms and conditions.')
+    toast.error('You must agree to the terms and conditions.')
     return
   }
   if (password.value !== confirmPassword.value) {
-    alert('Passwords do not match.')
+    toast.error('Passwords do not match.')
     return
   }
 
-  console.log('Account created:', {
-    fullName: fullName.value,
-    email: email.value
-  })
+  isSubmitting.value = true
 
-  router.push('/login')
+  try {
+    // ✅ Create user in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email.value,
+      password.value
+    )
+    const uid = userCredential.user.uid
+
+    // ✅ Save extra data in Firestore (e.g. fullName split into first/last if you want)
+    await setDoc(doc(db, 'users', uid), {
+      fullName: fullName.value,
+      email: email.value,
+      about: 'Hi! I am new here',
+      followersCount: 0,
+      followersUid: [],
+      createdAt: serverTimestamp(),
+    })
+
+    toast.success('Account created successfully!')
+
+    // ✅ Redirect to login
+    router.push('/login')
+  } catch (err) {
+    console.error(err)
+    toast.error('Failed to register. Please try again.')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -79,11 +111,22 @@ const handleRegister = () => {
         </div>
 
         <div>
-          <button type="submit"
+          <button
+            v-if="!isSubmitting"
+            type="submit"
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm 
             font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none 
             focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             Register
+          </button>
+          <button
+            v-else
+            type="button"
+            disabled
+            class="animate-pulse group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm 
+            font-medium rounded-md text-white bg-indigo-400 focus:outline-none 
+            focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Registering...
           </button>
         </div>
       </form>
